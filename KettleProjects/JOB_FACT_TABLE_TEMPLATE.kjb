@@ -22,6 +22,11 @@
       <description />
     </parameter>
     <parameter>
+      <name>current_details_id</name>
+      <default_value />
+      <description />
+    </parameter>
+    <parameter>
       <name>current_module_name</name>
       <default_value />
       <description />
@@ -42,7 +47,22 @@
       <description />
     </parameter>
     <parameter>
+      <name>max_last_update_time</name>
+      <default_value />
+      <description />
+    </parameter>
+    <parameter>
       <name>month_per_while</name>
+      <default_value />
+      <description />
+    </parameter>
+    <parameter>
+      <name>pre_details_id</name>
+      <default_value />
+      <description />
+    </parameter>
+    <parameter>
+      <name>summary_id</name>
       <default_value />
       <description />
     </parameter>
@@ -174,7 +194,7 @@
     <server>192.168.177.88</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>tom</database>
+    <database>solar_dw</database>
     <port>3306</port>
     <username>root</username>
     <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
@@ -587,62 +607,6 @@
       <yloc>96</yloc>
     </entry>
     <entry>
-      <name>区间跑当前ETL</name>
-      <description />
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id />
-      <filename>${kettle.ktr_job.folder}\${current_module_name}.ktr</filename>
-      <transname />
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile />
-      <logext />
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name />
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-        <parameter>
-          <name>begin_date_while</name>
-          <stream_name />
-          <value>${begin_date_while}</value>
-        </parameter>
-        <parameter>
-          <name>end_date</name>
-          <stream_name />
-          <value>${end_date}</value>
-        </parameter>
-        <parameter>
-          <name>month_per_while</name>
-          <stream_name />
-          <value>${month_per_while}</value>
-        </parameter>
-        <parameter>
-          <name>etl_type</name>
-          <stream_name />
-          <value>${etl_type}</value>
-        </parameter>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>368</xloc>
-      <yloc>384</yloc>
-    </entry>
-    <entry>
       <name>是否继续循环</name>
       <description />
       <type>SIMPLE_EVAL</type>
@@ -681,8 +645,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>160</xloc>
-      <yloc>96</yloc>
+      <xloc>32</xloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>获取ETL类型和起止时间</name>
@@ -710,7 +674,7 @@
       <follow_abort_remote>N</follow_abort_remote>
       <create_parent_folder>N</create_parent_folder>
       <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
+      <run_configuration />
       <parameters>
         <pass_all_parameters>Y</pass_all_parameters>
         <parameter>
@@ -747,8 +711,8 @@
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>288</xloc>
-      <yloc>96</yloc>
+      <xloc>176</xloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>成功</name>
@@ -800,7 +764,7 @@ false;</script>
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id />
-      <filename>${kettle.ktr_job.folder}/${current_module_name}.ktr</filename>
+      <filename>${kettle.ktr_job.folder}/LOAD_DELETE_MERGE_TEMPLATE.ktr</filename>
       <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -843,6 +807,16 @@ false;</script>
           <stream_name />
           <value>${month_per_while}</value>
         </parameter>
+        <parameter>
+          <name>summary_id</name>
+          <stream_name />
+          <value>${summary_id}</value>
+        </parameter>
+        <parameter>
+          <name>current_module_name</name>
+          <stream_name />
+          <value>${current_module_name}</value>
+        </parameter>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
@@ -851,12 +825,139 @@ false;</script>
       <yloc>96</yloc>
     </entry>
     <entry>
-      <name>递增循环月份</name>
+      <name>add summary log</name>
       <description />
       <type>TRANS</type>
       <specification_method>filename</specification_method>
       <trans_object_id />
-      <filename>${kettle.ktr_job.folder}/ktr_incre_begin_date_while.ktr</filename>
+      <filename>${kettle.ktr_job.folder}/ktr_add_summary_log.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration>Pentaho local</run_configuration>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>current_module_name</name>
+          <stream_name />
+          <value>${current_module_name}</value>
+        </parameter>
+        <parameter>
+          <name>etl_type</name>
+          <stream_name />
+          <value>${etl_type}</value>
+        </parameter>
+        <parameter>
+          <name>summary_id</name>
+          <stream_name />
+          <value>${summary_id}</value>
+        </parameter>
+        <parameter>
+          <name>pre_details_id</name>
+          <stream_name />
+          <value>${pre_details_id}</value>
+        </parameter>
+        <parameter>
+          <name>max_last_update_time</name>
+          <stream_name />
+          <value>${max_last_update_time}</value>
+        </parameter>
+        <parameter>
+          <name>summary_log_create_1_or_update_2</name>
+          <stream_name />
+          <value>1</value>
+        </parameter>
+        <parameter>
+          <name>job_status</name>
+          <stream_name />
+          <value>begining</value>
+        </parameter>
+        <parameter>
+          <name>error_message_text</name>
+          <stream_name />
+          <value>null</value>
+        </parameter>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>176</xloc>
+      <yloc>96</yloc>
+    </entry>
+    <entry>
+      <name>递增循环时间</name>
+      <description />
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Job.Filename.Directory}/ktr_incre_begin_date_while.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration />
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>begin_date_while</name>
+          <stream_name />
+          <value>${begin_date_while}</value>
+        </parameter>
+        <parameter>
+          <name>begin_date_while_int</name>
+          <stream_name />
+          <value>${begin_date_while_int}</value>
+        </parameter>
+        <parameter>
+          <name>month_per_while</name>
+          <stream_name />
+          <value>${month_per_while}</value>
+        </parameter>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>560</xloc>
+      <yloc>352</yloc>
+    </entry>
+    <entry>
+      <name>区间跑当前ETL</name>
+      <description />
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${kettle.ktr_job.folder}/LOAD_DELETE_MERGE_TEMPLATE.ktr</filename>
       <transname />
       <arg_from_previous>N</arg_from_previous>
       <params_from_previous>N</params_from_previous>
@@ -885,33 +986,176 @@ false;</script>
           <value>${begin_date_while}</value>
         </parameter>
         <parameter>
-          <name>begin_date_while_int</name>
+          <name>current_module_name</name>
           <stream_name />
-          <value>${begin_date_while_int}</value>
+          <value>${current_module_name}</value>
+        </parameter>
+        <parameter>
+          <name>end_date</name>
+          <stream_name />
+          <value>${end_date}</value>
+        </parameter>
+        <parameter>
+          <name>etl_type</name>
+          <stream_name />
+          <value>${etl_type}</value>
         </parameter>
         <parameter>
           <name>month_per_while</name>
           <stream_name />
           <value>${month_per_while}</value>
         </parameter>
+        <parameter>
+          <name>summary_id</name>
+          <stream_name />
+          <value>${summary_id}</value>
+        </parameter>
+        <parameter>
+          <name>max_last_update_time</name>
+          <stream_name />
+          <value>${max_last_update_time}</value>
+        </parameter>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>528</xloc>
-      <yloc>384</yloc>
+      <xloc>352</xloc>
+      <yloc>352</yloc>
+    </entry>
+    <entry>
+      <name>调用ETL设置查询语句</name>
+      <description />
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${Internal.Entry.Current.Directory}/${current_module_name}.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration>Pentaho local</run_configuration>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>begin_date_while</name>
+          <stream_name />
+          <value>${begin_date_while}</value>
+        </parameter>
+        <parameter>
+          <name>max_last_update_time</name>
+          <stream_name />
+          <value>${max_last_update_time}</value>
+        </parameter>
+        <parameter>
+          <name>month_per_while</name>
+          <stream_name />
+          <value>${month_per_while}</value>
+        </parameter>
+        <parameter>
+          <name>summary_id</name>
+          <stream_name />
+          <value>${summary_id}</value>
+        </parameter>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>320</xloc>
+      <yloc>96</yloc>
+    </entry>
+    <entry>
+      <name>succeed summary log</name>
+      <description />
+      <type>TRANS</type>
+      <specification_method>filename</specification_method>
+      <trans_object_id />
+      <filename>${kettle.ktr_job.folder}/ktr_add_summary_log.ktr</filename>
+      <transname />
+      <arg_from_previous>N</arg_from_previous>
+      <params_from_previous>N</params_from_previous>
+      <exec_per_row>N</exec_per_row>
+      <clear_rows>N</clear_rows>
+      <clear_files>N</clear_files>
+      <set_logfile>N</set_logfile>
+      <logfile />
+      <logext />
+      <add_date>N</add_date>
+      <add_time>N</add_time>
+      <loglevel>Basic</loglevel>
+      <cluster>N</cluster>
+      <slave_server_name />
+      <set_append_logfile>N</set_append_logfile>
+      <wait_until_finished>Y</wait_until_finished>
+      <follow_abort_remote>N</follow_abort_remote>
+      <create_parent_folder>N</create_parent_folder>
+      <logging_remote_work>N</logging_remote_work>
+      <run_configuration>Pentaho local</run_configuration>
+      <parameters>
+        <pass_all_parameters>Y</pass_all_parameters>
+        <parameter>
+          <name>current_module_name</name>
+          <stream_name />
+          <value>${current_module_name}</value>
+        </parameter>
+        <parameter>
+          <name>etl_type</name>
+          <stream_name />
+          <value>${etl_type}</value>
+        </parameter>
+        <parameter>
+          <name>summary_id</name>
+          <stream_name />
+          <value>${summary_id}</value>
+        </parameter>
+        <parameter>
+          <name>pre_details_id</name>
+          <stream_name />
+          <value>${pre_details_id}</value>
+        </parameter>
+        <parameter>
+          <name>max_last_update_time</name>
+          <stream_name />
+          <value>${max_last_update_time}</value>
+        </parameter>
+        <parameter>
+          <name>summary_log_create_1_or_update_2</name>
+          <stream_name />
+          <value>2</value>
+        </parameter>
+        <parameter>
+          <name>job_status</name>
+          <stream_name />
+          <value>succeed</value>
+        </parameter>
+        <parameter>
+          <name>error_message_text</name>
+          <stream_name />
+          <value>null</value>
+        </parameter>
+      </parameters>
+      <parallel>N</parallel>
+      <draw>Y</draw>
+      <nr>0</nr>
+      <xloc>800</xloc>
+      <yloc>224</yloc>
     </entry>
   </entries>
   <hops>
-    <hop>
-      <from>是否继续循环</from>
-      <to>区间跑当前ETL</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
     <hop>
       <from>START</from>
       <to>设置ETL名称</to>
@@ -922,30 +1166,12 @@ false;</script>
       <unconditional>Y</unconditional>
     </hop>
     <hop>
-      <from>设置ETL名称</from>
-      <to>获取ETL类型和起止时间</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
       <from>是否继续循环</from>
       <to>成功</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>获取ETL类型和起止时间</from>
-      <to>是否区间导？</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
@@ -976,8 +1202,8 @@ false;</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>区间跑当前ETL</from>
-      <to>递增循环月份</to>
+      <from>设置ETL名称</from>
+      <to>获取ETL类型和起止时间</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -985,8 +1211,62 @@ false;</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>递增循环月份</from>
+      <from>获取ETL类型和起止时间</from>
+      <to>add summary log</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>是否继续循环</from>
+      <to>区间跑当前ETL</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>区间跑当前ETL</from>
+      <to>递增循环时间</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>递增循环时间</from>
       <to>是否继续循环</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>add summary log</from>
+      <to>调用ETL设置查询语句</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>调用ETL设置查询语句</from>
+      <to>是否区间导？</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>成功</from>
+      <to>succeed summary log</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>

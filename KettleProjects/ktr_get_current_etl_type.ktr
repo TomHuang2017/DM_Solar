@@ -588,7 +588,7 @@
     <server>192.168.177.88</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>tom</database>
+    <database>solar_dw</database>
     <port>3306</port>
     <username>root</username>
     <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
