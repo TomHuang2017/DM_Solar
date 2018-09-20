@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ktr_add_summary_log</name>
+    <name>FACT_OPD_Accept_Demo</name>
     <description />
     <extended_description />
     <trans_version />
@@ -10,38 +10,23 @@
     <directory>/</directory>
     <parameters>
       <parameter>
-        <name>current_module_name</name>
-        <default_value />
-        <description />
-      </parameter>
-      <parameter>
-        <name>error_message_text</name>
-        <default_value />
-        <description />
-      </parameter>
-      <parameter>
-        <name>etl_type</name>
-        <default_value />
-        <description />
-      </parameter>
-      <parameter>
-        <name>job_status</name>
+        <name>begin_date_while</name>
         <default_value />
         <description />
       </parameter>
       <parameter>
         <name>max_last_update_time</name>
-        <default_value>2018-01-01</default_value>
+        <default_value />
+        <description />
+      </parameter>
+      <parameter>
+        <name>month_per_while</name>
+        <default_value />
         <description />
       </parameter>
       <parameter>
         <name>summary_id</name>
-        <default_value>1</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>summary_log_create_1_or_update_2</name>
-        <default_value>2</default_value>
+        <default_value />
         <description />
       </parameter>
     </parameters>
@@ -463,9 +448,9 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2018/09/12 15:00:59.003</created_date>
+    <created_date>2018/09/18 13:08:16.588</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2018/09/12 15:00:59.003</modified_date>
+    <modified_date>2018/09/18 13:08:16.588</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
@@ -717,89 +702,28 @@
   </connection>
   <order>
     <hop>
-      <from>get summary_id &amp; details_id</from>
-      <to>set summary_id &amp; pre_details_id</to>
+      <from>SELECT语句（只包含通用条件）</from>
+      <to>同比执行1</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>add summary log</from>
-      <to>get summary_id &amp; details_id</to>
+      <from>同比执行1</from>
+      <to>区间跑Where条件</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>set summary_id &amp; pre_details_id</from>
-      <to>get prev's max timestamp</to>
+      <from>区间跑Where条件</from>
+      <to>同比执行2</to>
       <enabled>Y</enabled>
     </hop>
     <hop>
-      <from>get prev's max timestamp</from>
-      <to>set prev's max timestamp</to>
-      <enabled>N</enabled>
-    </hop>
-    <hop>
-      <from>get summary log process type</from>
-      <to>[add / update] summary log</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>[add / update] summary log</from>
-      <to>add summary log</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>[add / update] summary log</from>
-      <to>update summary log</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>set prev's max timestamp</from>
-      <to>end log</to>
+      <from>同比执行2</from>
+      <to>增量跑Where条件</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>[add / update] summary log</name>
-    <type>SwitchCase</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fieldname>create_1_or_update_2</fieldname>
-    <use_contains>N</use_contains>
-    <case_value_type>Integer</case_value_type>
-    <case_value_format />
-    <case_value_decimal />
-    <case_value_group />
-    <default_target_step>add summary log</default_target_step>
-    <cases>
-      <case>
-        <value>1</value>
-        <target_step>add summary log</target_step>
-      </case>
-      <case>
-        <value>2</value>
-        <target_step>update summary log</target_step>
-      </case>
-    </cases>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>144</xloc>
-      <yloc>128</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>add summary log</name>
+    <name>SELECT语句（只包含通用条件）</name>
     <type>ExecSQL</type>
     <description />
     <distribute>Y</distribute>
@@ -810,263 +734,27 @@
       <schema_name />
     </partitioning>
     <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
+    <execute_each_row>N</execute_each_row>
     <single_statement>N</single_statement>
     <replace_variables>Y</replace_variables>
     <quoteString>N</quoteString>
-    <sql>SET @return_summary_id=0;
+    <sql>set @select_query='';
+set @select_query='
+select 
+	ID,
+	VisitNumber,
+	EmpCode,
+	RegisterDate,
+	GETDATE() AS LastUpdateTime,
+	IsDeleted
+from FACT_OPD_Register_Demo
+WHERE 1=1
+';
+
+
 SET @return_pre_details_id=0;
-
-CALL log_summary_add('${current_module_name}',${etl_type},@return_summary_id);
-
-CALL log_details_add(@return_summary_id,'ETL begining',0,'${current_module_name}->etl begining',0);</sql>
-    <set_params>N</set_params>
-    <insert_field />
-    <update_field />
-    <delete_field />
-    <read_field />
-    <arguments>
-    </arguments>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>336</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>get prev's max timestamp</name>
-    <type>TableInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <sql>select ifnull(max(max_timestamp),now()) as max_last_update_time from log_summary 
-where module_name='${current_module_name}' and status='succeed';</sql>
-    <limit>0</limit>
-    <lookup />
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>672</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>get summary log process type</name>
-    <type>TableInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <sql>SELECT cast('${summary_log_create_1_or_update_2}' as SIGNED) as create_1_or_update_2
-from mysql.db limit 1;</sql>
-    <limit>0</limit>
-    <lookup />
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>80</xloc>
-      <yloc>32</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>get summary_id &amp; details_id</name>
-    <type>TableInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <sql>SELECT max(summary_id) as summary_id,max(details_id) as pre_details_id from log_details
-where summary_id in(
-select max(summary_id) as summary_id from log_summary where module_name='${current_module_name}'
-)</sql>
-    <limit>0</limit>
-    <lookup />
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>416</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>set prev's max timestamp</name>
-    <type>SetVariable</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fields>
-      <field>
-        <field_name>max_last_update_time</field_name>
-        <variable_name>max_last_update_time</variable_name>
-        <variable_type>PARENT_JOB</variable_type>
-        <default_value />
-      </field>
-    </fields>
-    <use_formatting>Y</use_formatting>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>784</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>set summary_id &amp; pre_details_id</name>
-    <type>SetVariable</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fields>
-      <field>
-        <field_name>summary_id</field_name>
-        <variable_name>summary_id</variable_name>
-        <variable_type>PARENT_JOB</variable_type>
-        <default_value />
-      </field>
-      <field>
-        <field_name>pre_details_id</field_name>
-        <variable_name>pre_details_id</variable_name>
-        <variable_type>PARENT_JOB</variable_type>
-        <default_value />
-      </field>
-    </fields>
-    <use_formatting>Y</use_formatting>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>560</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>update summary log</name>
-    <type>ExecSQL</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
-    <single_statement>N</single_statement>
-    <replace_variables>Y</replace_variables>
-    <quoteString>N</quoteString>
-    <sql>CALL log_summary_update(${summary_id},'${max_last_update_time}','${job_status}','${error_message_text}');
-</sql>
-    <set_params>N</set_params>
-    <insert_field />
-    <update_field />
-    <delete_field />
-    <read_field />
-    <arguments>
-    </arguments>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>224</xloc>
-      <yloc>240</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>end log</name>
-    <type>ExecSQL</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
-    <single_statement>N</single_statement>
-    <replace_variables>Y</replace_variables>
-    <quoteString>N</quoteString>
-    <sql>SET @return_pre_details_id=0;
 SELECT @return_pre_details_id:=MAX(details_id) from log_details where summary_id=${summary_id};
-CALL log_details_add(${summary_id},'Loading ${current_module_name}',0,'Finished to get summary id ${summary_id}',@return_pre_details_id);
+CALL log_details_add(${summary_id},'select query',0,@select_query,@return_pre_details_id);
 select * from mysql.db limit 2;</sql>
     <set_params>N</set_params>
     <insert_field />
@@ -1083,8 +771,164 @@ select * from mysql.db limit 2;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>912</xloc>
-      <yloc>208</yloc>
+      <xloc>208</xloc>
+      <yloc>96</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>区间跑Where条件</name>
+    <type>ExecSQL</type>
+    <description />
+    <distribute>N</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <connection>mysql_destination</connection>
+    <execute_each_row>Y</execute_each_row>
+    <single_statement>N</single_statement>
+    <replace_variables>Y</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>set @range_where_query='';
+set @range_where_query=
+' 
+AND IsDeleted =0 
+AND RegisterDate>=cast(''(begin_date_while)'' as date) 
+AND RegisterDate&lt;DATEADD(MONTH,(month_per_while),cast(''(begin_date_while)'' as date))
+';
+
+
+SET @return_pre_details_id=0;
+SELECT @return_pre_details_id:=MAX(details_id) from log_details where summary_id=${summary_id};
+CALL log_details_add(${summary_id},'range where query',0,@range_where_query,@return_pre_details_id);
+select * from mysql.db limit 2;</sql>
+    <set_params>N</set_params>
+    <insert_field />
+    <update_field />
+    <delete_field />
+    <read_field />
+    <arguments>
+    </arguments>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>416</xloc>
+      <yloc>96</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>同比执行1</name>
+    <type>BlockingStep</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <pass_all_rows>N</pass_all_rows>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>block</prefix>
+    <cache_size>5000</cache_size>
+    <compress>Y</compress>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>320</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>同比执行2</name>
+    <type>BlockingStep</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <pass_all_rows>N</pass_all_rows>
+    <directory>%%java.io.tmpdir%%</directory>
+    <prefix>block</prefix>
+    <cache_size>5000</cache_size>
+    <compress>Y</compress>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>528</xloc>
+      <yloc>240</yloc>
+      <draw>Y</draw>
+    </GUI>
+  </step>
+  <step>
+    <name>增量跑Where条件</name>
+    <type>ExecSQL</type>
+    <description />
+    <distribute>Y</distribute>
+    <custom_distribution />
+    <copies>1</copies>
+    <partitioning>
+      <method>none</method>
+      <schema_name />
+    </partitioning>
+    <connection>mysql_destination</connection>
+    <execute_each_row>Y</execute_each_row>
+    <single_statement>N</single_statement>
+    <replace_variables>Y</replace_variables>
+    <quoteString>N</quoteString>
+    <sql>set @incremental_where_query='';
+
+/*You only need to update this variable @incremental_where_query*/
+set @incremental_where_query=
+'
+ AND LastUpdateTime>''${max_last_update_time}''
+';
+
+
+SET @return_pre_details_id=0;
+SELECT @return_pre_details_id:=MAX(details_id) from log_details where summary_id=${summary_id};
+CALL log_details_add(${summary_id},'incremental where query',0,@incremental_where_query,@return_pre_details_id);
+select * from mysql.db limit 2;</sql>
+    <set_params>N</set_params>
+    <insert_field />
+    <update_field />
+    <delete_field />
+    <read_field />
+    <arguments>
+    </arguments>
+    <cluster_schema />
+    <remotesteps>
+      <input>
+      </input>
+      <output>
+      </output>
+    </remotesteps>
+    <GUI>
+      <xloc>624</xloc>
+      <yloc>96</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

@@ -751,11 +751,6 @@
       <to>update summary log</to>
       <enabled>Y</enabled>
     </hop>
-    <hop>
-      <from>set prev's max timestamp</from>
-      <to>end log</to>
-      <enabled>Y</enabled>
-    </hop>
   </order>
   <step>
     <name>[add / update] summary log</name>
@@ -1049,8 +1044,8 @@ select max(summary_id) as summary_id from log_summary where module_name='${curre
     </GUI>
   </step>
   <step>
-    <name>end log</name>
-    <type>ExecSQL</type>
+    <name>JavaScript代码</name>
+    <type>ScriptValueMod</type>
     <description />
     <distribute>Y</distribute>
     <custom_distribution />
@@ -1059,22 +1054,18 @@ select max(summary_id) as summary_id from log_summary where module_name='${curre
       <method>none</method>
       <schema_name />
     </partitioning>
-    <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
-    <single_statement>N</single_statement>
-    <replace_variables>Y</replace_variables>
-    <quoteString>N</quoteString>
-    <sql>SET @return_pre_details_id=0;
-SELECT @return_pre_details_id:=MAX(details_id) from log_details where summary_id=${summary_id};
-CALL log_details_add(${summary_id},'Loading ${current_module_name}',0,'Finished to get summary id ${summary_id}',@return_pre_details_id);
-select * from mysql.db limit 2;</sql>
-    <set_params>N</set_params>
-    <insert_field />
-    <update_field />
-    <delete_field />
-    <read_field />
-    <arguments>
-    </arguments>
+    <compatible>N</compatible>
+    <optimizationLevel>9</optimizationLevel>
+    <jsScripts>
+      <jsScript>
+        <jsScript_type>0</jsScript_type>
+        <jsScript_name>Script 1</jsScript_name>
+        <jsScript_script>//Script here
+
+</jsScript_script>
+      </jsScript>
+    </jsScripts>
+    <fields>    </fields>
     <cluster_schema />
     <remotesteps>
       <input>
@@ -1083,8 +1074,8 @@ select * from mysql.db limit 2;</sql>
       </output>
     </remotesteps>
     <GUI>
-      <xloc>912</xloc>
-      <yloc>208</yloc>
+      <xloc>272</xloc>
+      <yloc>448</yloc>
       <draw>Y</draw>
     </GUI>
   </step>

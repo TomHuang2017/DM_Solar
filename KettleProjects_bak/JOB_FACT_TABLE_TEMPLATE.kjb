@@ -609,7 +609,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>32</xloc>
-      <yloc>256</yloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>是否继续循环</name>
@@ -631,7 +631,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>464</xloc>
-      <yloc>256</yloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>获取ETL类型和起止时间</name>
@@ -697,7 +697,7 @@
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>176</xloc>
-      <yloc>256</yloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>month_per_month</name>
@@ -709,7 +709,7 @@ false;</script>
       <draw>N</draw>
       <nr>0</nr>
       <xloc>352</xloc>
-      <yloc>256</yloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>是否区间导？</name>
@@ -731,7 +731,7 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>464</xloc>
-      <yloc>128</yloc>
+      <yloc>96</yloc>
     </entry>
     <entry>
       <name>增量跑当前ETL</name>
@@ -797,17 +797,12 @@ false;</script>
           <stream_name />
           <value>${whole_select_where_query}</value>
         </parameter>
-        <parameter>
-          <name>max_last_update_time</name>
-          <stream_name />
-          <value>${max_last_update_time}</value>
-        </parameter>
       </parameters>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>640</xloc>
-      <yloc>160</yloc>
+      <xloc>624</xloc>
+      <yloc>96</yloc>
     </entry>
     <entry>
       <name>add summary log</name>
@@ -883,7 +878,7 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>176</xloc>
-      <yloc>128</yloc>
+      <yloc>96</yloc>
     </entry>
     <entry>
       <name>递增循环时间</name>
@@ -934,7 +929,7 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>624</xloc>
-      <yloc>336</yloc>
+      <yloc>304</yloc>
     </entry>
     <entry>
       <name>区间跑当前ETL</name>
@@ -1010,10 +1005,10 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>464</xloc>
-      <yloc>400</yloc>
+      <yloc>368</yloc>
     </entry>
     <entry>
-      <name>调用FACT_XXX转换设置查询语句</name>
+      <name>调用ETL设置查询语句</name>
       <description />
       <type>TRANS</type>
       <specification_method>filename</specification_method>
@@ -1066,7 +1061,7 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>320</xloc>
-      <yloc>160</yloc>
+      <yloc>96</yloc>
     </entry>
     <entry>
       <name>succeed summary log</name>
@@ -1142,7 +1137,7 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>848</xloc>
-      <yloc>256</yloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>成功</name>
@@ -1151,8 +1146,8 @@ false;</script>
       <parallel>N</parallel>
       <draw>Y</draw>
       <nr>0</nr>
-      <xloc>640</xloc>
-      <yloc>256</yloc>
+      <xloc>624</xloc>
+      <yloc>224</yloc>
     </entry>
     <entry>
       <name>generate [whole_select_where_query]</name>
@@ -1208,63 +1203,7 @@ false;</script>
       <draw>Y</draw>
       <nr>0</nr>
       <xloc>320</xloc>
-      <yloc>336</yloc>
-    </entry>
-    <entry>
-      <name>generate incremental [whole_select_where_query]</name>
-      <description />
-      <type>TRANS</type>
-      <specification_method>filename</specification_method>
-      <trans_object_id />
-      <filename>${kettle.ktr_job.folder}/ktr_generate_whole_select_where_query.ktr</filename>
-      <transname />
-      <arg_from_previous>N</arg_from_previous>
-      <params_from_previous>N</params_from_previous>
-      <exec_per_row>N</exec_per_row>
-      <clear_rows>N</clear_rows>
-      <clear_files>N</clear_files>
-      <set_logfile>N</set_logfile>
-      <logfile />
-      <logext />
-      <add_date>N</add_date>
-      <add_time>N</add_time>
-      <loglevel>Basic</loglevel>
-      <cluster>N</cluster>
-      <slave_server_name />
-      <set_append_logfile>N</set_append_logfile>
-      <wait_until_finished>Y</wait_until_finished>
-      <follow_abort_remote>N</follow_abort_remote>
-      <create_parent_folder>N</create_parent_folder>
-      <logging_remote_work>N</logging_remote_work>
-      <run_configuration>Pentaho local</run_configuration>
-      <parameters>
-        <pass_all_parameters>Y</pass_all_parameters>
-        <parameter>
-          <name>summary_id</name>
-          <stream_name />
-          <value>${summary_id}</value>
-        </parameter>
-        <parameter>
-          <name>whole_select_where_query</name>
-          <stream_name />
-          <value>${whole_select_where_query}</value>
-        </parameter>
-        <parameter>
-          <name>begin_date_while</name>
-          <stream_name />
-          <value>${begin_date_while}</value>
-        </parameter>
-        <parameter>
-          <name>month_per_while</name>
-          <stream_name />
-          <value>${month_per_while}</value>
-        </parameter>
-      </parameters>
-      <parallel>N</parallel>
-      <draw>Y</draw>
-      <nr>0</nr>
-      <xloc>640</xloc>
-      <yloc>80</yloc>
+      <yloc>304</yloc>
     </entry>
   </entries>
   <hops>
@@ -1275,6 +1214,15 @@ false;</script>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
+      <unconditional>N</unconditional>
+    </hop>
+    <hop>
+      <from>是否区间导？</from>
+      <to>增量跑当前ETL</to>
+      <from_nr>0</from_nr>
+      <to_nr>0</to_nr>
+      <enabled>Y</enabled>
+      <evaluation>N</evaluation>
       <unconditional>N</unconditional>
     </hop>
     <hop>
@@ -1306,7 +1254,7 @@ false;</script>
     </hop>
     <hop>
       <from>add summary log</from>
-      <to>调用FACT_XXX转换设置查询语句</to>
+      <to>调用ETL设置查询语句</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
       <enabled>Y</enabled>
@@ -1314,7 +1262,7 @@ false;</script>
       <unconditional>N</unconditional>
     </hop>
     <hop>
-      <from>调用FACT_XXX转换设置查询语句</from>
+      <from>调用ETL设置查询语句</from>
       <to>是否区间导？</to>
       <from_nr>0</from_nr>
       <to_nr>0</to_nr>
@@ -1375,24 +1323,6 @@ false;</script>
       <enabled>Y</enabled>
       <evaluation>Y</evaluation>
       <unconditional>Y</unconditional>
-    </hop>
-    <hop>
-      <from>是否区间导？</from>
-      <to>generate incremental [whole_select_where_query]</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>N</evaluation>
-      <unconditional>N</unconditional>
-    </hop>
-    <hop>
-      <from>generate incremental [whole_select_where_query]</from>
-      <to>增量跑当前ETL</to>
-      <from_nr>0</from_nr>
-      <to_nr>0</to_nr>
-      <enabled>Y</enabled>
-      <evaluation>Y</evaluation>
-      <unconditional>N</unconditional>
     </hop>
   </hops>
   <notepads>

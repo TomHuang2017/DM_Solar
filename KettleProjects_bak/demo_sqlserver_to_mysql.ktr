@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <transformation>
   <info>
-    <name>ktr_add_summary_log</name>
+    <name>demo_sqlserver_to_mysql</name>
     <description />
     <extended_description />
     <trans_version />
@@ -10,12 +10,12 @@
     <directory>/</directory>
     <parameters>
       <parameter>
-        <name>current_module_name</name>
+        <name>begin_date_while</name>
         <default_value />
         <description />
       </parameter>
       <parameter>
-        <name>error_message_text</name>
+        <name>end_date</name>
         <default_value />
         <description />
       </parameter>
@@ -25,23 +25,8 @@
         <description />
       </parameter>
       <parameter>
-        <name>job_status</name>
+        <name>month_per_while</name>
         <default_value />
-        <description />
-      </parameter>
-      <parameter>
-        <name>max_last_update_time</name>
-        <default_value>2018-01-01</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>summary_id</name>
-        <default_value>1</default_value>
-        <description />
-      </parameter>
-      <parameter>
-        <name>summary_log_create_1_or_update_2</name>
-        <default_value>2</default_value>
         <description />
       </parameter>
     </parameters>
@@ -463,9 +448,9 @@
     <clusterschemas>
     </clusterschemas>
     <created_user>-</created_user>
-    <created_date>2018/09/12 15:00:59.003</created_date>
+    <created_date>2018/09/07 16:27:45.085</created_date>
     <modified_user>-</modified_user>
-    <modified_date>2018/09/12 15:00:59.003</modified_date>
+    <modified_date>2018/09/07 16:27:45.085</modified_date>
     <key_for_session_key>H4sIAAAAAAAAAAMAAAAAAAAAAAA=</key_for_session_key>
     <is_key_private>N</is_key_private>
   </info>
@@ -598,7 +583,7 @@
     <server>192.168.177.88</server>
     <type>MYSQL</type>
     <access>Native</access>
-    <database>solar_dw</database>
+    <database>tom</database>
     <port>3306</port>
     <username>root</username>
     <password>Encrypted 2be98afc86aa7f2e4cb79ce10cc9da0ce</password>
@@ -717,49 +702,14 @@
   </connection>
   <order>
     <hop>
-      <from>get summary_id &amp; details_id</from>
-      <to>set summary_id &amp; pre_details_id</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>add summary log</from>
-      <to>get summary_id &amp; details_id</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>set summary_id &amp; pre_details_id</from>
-      <to>get prev's max timestamp</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>get prev's max timestamp</from>
-      <to>set prev's max timestamp</to>
-      <enabled>N</enabled>
-    </hop>
-    <hop>
-      <from>get summary log process type</from>
-      <to>[add / update] summary log</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>[add / update] summary log</from>
-      <to>add summary log</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>[add / update] summary log</from>
-      <to>update summary log</to>
-      <enabled>Y</enabled>
-    </hop>
-    <hop>
-      <from>set prev's max timestamp</from>
-      <to>end log</to>
+      <from>从sqlserver取数据</from>
+      <to>导入mysql</to>
       <enabled>Y</enabled>
     </hop>
   </order>
   <step>
-    <name>[add / update] summary log</name>
-    <type>SwitchCase</type>
+    <name>从sqlserver取数据</name>
+    <type>TableInput</type>
     <description />
     <distribute>Y</distribute>
     <custom_distribution />
@@ -768,23 +718,32 @@
       <method>none</method>
       <schema_name />
     </partitioning>
-    <fieldname>create_1_or_update_2</fieldname>
-    <use_contains>N</use_contains>
-    <case_value_type>Integer</case_value_type>
-    <case_value_format />
-    <case_value_decimal />
-    <case_value_group />
-    <default_target_step>add summary log</default_target_step>
-    <cases>
-      <case>
-        <value>1</value>
-        <target_step>add summary log</target_step>
-      </case>
-      <case>
-        <value>2</value>
-        <target_step>update summary log</target_step>
-      </case>
-    </cases>
+    <connection>sqlserver_source</connection>
+    <sql>declare @sql nvarchar(max)=''
+set @sql='
+select 
+	ID,
+	VisitNumber,
+	EmpCode,
+	RegisterDate,
+	GETDATE() AS LastUpdateTime,
+	IsDeleted
+from FACT_OPD_Register_Demo
+WHERE 1=1
+'
+set @sql=@sql+ 
+	CASE WHEN '${etl_type}'='2' then 
+		' AND IsDeleted =0 and RegisterDate>=cast(''${begin_date_while}'' as date) AND RegisterDate&lt;DATEADD(MONTH,${month_per_while},cast(''${begin_date_while}'' as date))'
+		 ELSE ' AND LastUpdateTime>''2018-09-11 09:44:53'''
+	END
+
+exec (@sql)
+</sql>
+    <limit>0</limit>
+    <lookup />
+    <execute_each_row>N</execute_each_row>
+    <variables_active>Y</variables_active>
+    <lazy_conversion_active>N</lazy_conversion_active>
     <cluster_schema />
     <remotesteps>
       <input>
@@ -793,14 +752,14 @@
       </output>
     </remotesteps>
     <GUI>
-      <xloc>144</xloc>
+      <xloc>208</xloc>
       <yloc>128</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
   <step>
-    <name>add summary log</name>
-    <type>ExecSQL</type>
+    <name>导入mysql</name>
+    <type>InsertUpdate</type>
     <description />
     <distribute>Y</distribute>
     <custom_distribution />
@@ -810,23 +769,48 @@
       <schema_name />
     </partitioning>
     <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
-    <single_statement>N</single_statement>
-    <replace_variables>Y</replace_variables>
-    <quoteString>N</quoteString>
-    <sql>SET @return_summary_id=0;
-SET @return_pre_details_id=0;
-
-CALL log_summary_add('${current_module_name}',${etl_type},@return_summary_id);
-
-CALL log_details_add(@return_summary_id,'ETL begining',0,'${current_module_name}->etl begining',0);</sql>
-    <set_params>N</set_params>
-    <insert_field />
-    <update_field />
-    <delete_field />
-    <read_field />
-    <arguments>
-    </arguments>
+    <commit>100000</commit>
+    <update_bypassed>N</update_bypassed>
+    <lookup>
+      <schema />
+      <table>FACT_OPD_Register_Demo</table>
+      <key>
+        <name>ID</name>
+        <field>ID</field>
+        <condition>=</condition>
+        <name2 />
+      </key>
+      <value>
+        <name>ID</name>
+        <rename>ID</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>VisitNumber</name>
+        <rename>VisitNumber</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>EmpCode</name>
+        <rename>EmpCode</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>RegisterDate</name>
+        <rename>RegisterDate</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>LastUpdateTime</name>
+        <rename>LastUpdateTime</rename>
+        <update>Y</update>
+      </value>
+      <value>
+        <name>IsDeleted</name>
+        <rename>IsDeleted</rename>
+        <update>Y</update>
+      </value>
+    </lookup>
     <cluster_schema />
     <remotesteps>
       <input>
@@ -835,256 +819,8 @@ CALL log_details_add(@return_summary_id,'ETL begining',0,'${current_module_name}
       </output>
     </remotesteps>
     <GUI>
-      <xloc>336</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>get prev's max timestamp</name>
-    <type>TableInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <sql>select ifnull(max(max_timestamp),now()) as max_last_update_time from log_summary 
-where module_name='${current_module_name}' and status='succeed';</sql>
-    <limit>0</limit>
-    <lookup />
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>672</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>get summary log process type</name>
-    <type>TableInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <sql>SELECT cast('${summary_log_create_1_or_update_2}' as SIGNED) as create_1_or_update_2
-from mysql.db limit 1;</sql>
-    <limit>0</limit>
-    <lookup />
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>80</xloc>
-      <yloc>32</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>get summary_id &amp; details_id</name>
-    <type>TableInput</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <sql>SELECT max(summary_id) as summary_id,max(details_id) as pre_details_id from log_details
-where summary_id in(
-select max(summary_id) as summary_id from log_summary where module_name='${current_module_name}'
-)</sql>
-    <limit>0</limit>
-    <lookup />
-    <execute_each_row>N</execute_each_row>
-    <variables_active>Y</variables_active>
-    <lazy_conversion_active>N</lazy_conversion_active>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>416</xloc>
-      <yloc>208</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>set prev's max timestamp</name>
-    <type>SetVariable</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fields>
-      <field>
-        <field_name>max_last_update_time</field_name>
-        <variable_name>max_last_update_time</variable_name>
-        <variable_type>PARENT_JOB</variable_type>
-        <default_value />
-      </field>
-    </fields>
-    <use_formatting>Y</use_formatting>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>784</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>set summary_id &amp; pre_details_id</name>
-    <type>SetVariable</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <fields>
-      <field>
-        <field_name>summary_id</field_name>
-        <variable_name>summary_id</variable_name>
-        <variable_type>PARENT_JOB</variable_type>
-        <default_value />
-      </field>
-      <field>
-        <field_name>pre_details_id</field_name>
-        <variable_name>pre_details_id</variable_name>
-        <variable_type>PARENT_JOB</variable_type>
-        <default_value />
-      </field>
-    </fields>
-    <use_formatting>Y</use_formatting>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>560</xloc>
-      <yloc>96</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>update summary log</name>
-    <type>ExecSQL</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
-    <single_statement>N</single_statement>
-    <replace_variables>Y</replace_variables>
-    <quoteString>N</quoteString>
-    <sql>CALL log_summary_update(${summary_id},'${max_last_update_time}','${job_status}','${error_message_text}');
-</sql>
-    <set_params>N</set_params>
-    <insert_field />
-    <update_field />
-    <delete_field />
-    <read_field />
-    <arguments>
-    </arguments>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>224</xloc>
-      <yloc>240</yloc>
-      <draw>Y</draw>
-    </GUI>
-  </step>
-  <step>
-    <name>end log</name>
-    <type>ExecSQL</type>
-    <description />
-    <distribute>Y</distribute>
-    <custom_distribution />
-    <copies>1</copies>
-    <partitioning>
-      <method>none</method>
-      <schema_name />
-    </partitioning>
-    <connection>mysql_destination</connection>
-    <execute_each_row>Y</execute_each_row>
-    <single_statement>N</single_statement>
-    <replace_variables>Y</replace_variables>
-    <quoteString>N</quoteString>
-    <sql>SET @return_pre_details_id=0;
-SELECT @return_pre_details_id:=MAX(details_id) from log_details where summary_id=${summary_id};
-CALL log_details_add(${summary_id},'Loading ${current_module_name}',0,'Finished to get summary id ${summary_id}',@return_pre_details_id);
-select * from mysql.db limit 2;</sql>
-    <set_params>N</set_params>
-    <insert_field />
-    <update_field />
-    <delete_field />
-    <read_field />
-    <arguments>
-    </arguments>
-    <cluster_schema />
-    <remotesteps>
-      <input>
-      </input>
-      <output>
-      </output>
-    </remotesteps>
-    <GUI>
-      <xloc>912</xloc>
-      <yloc>208</yloc>
+      <xloc>402</xloc>
+      <yloc>124</yloc>
       <draw>Y</draw>
     </GUI>
   </step>
